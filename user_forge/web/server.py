@@ -133,6 +133,30 @@ def api_delete_account(account_id: int):
     success = vault.delete_account(account_id)
     return jsonify({"success": success})
 
+@app.route("/api/accounts/<int:account_id>", methods=["PUT", "POST"])
+def api_update_account(account_id: int):
+    payload = request.json or {}
+    vault = get_vault()
+    account = vault.update_account(
+        account_id=account_id,
+        username=payload.get("username"),
+        email=payload.get("email"),
+        password=payload.get("password") or None,
+        full_name=payload.get("full_name"),
+        project_id=payload.get("project_id"),
+        status=payload.get("status"),
+        birth_date=payload.get("birth_date"),
+        metadata=payload.get("metadata")
+    )
+    if not account:
+        return jsonify({"success": False, "error": "Cuenta no encontrada"}), 404
+
+    dec_pass = vault.get_decrypted_password(account)
+    acc_data = account.model_dump()
+    acc_data["password"] = dec_pass
+    acc_data.pop("password_encrypted", None)
+    return jsonify({"success": True, "account": acc_data})
+
 @app.route("/api/accounts/<int:account_id>/password", methods=["POST"])
 def api_update_account_password(account_id: int):
     payload = request.json or {}

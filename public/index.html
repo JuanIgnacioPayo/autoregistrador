@@ -587,6 +587,89 @@
     </div>
   </div>
 
+  <!-- EDIT ACCOUNT MODAL -->
+  <div id="modal-edit-account" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative my-auto max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 shrink-0">
+        <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-5 h-5 text-indigo-400"></i> Editar Datos de Cuenta
+        </h3>
+        <button onclick="closeEditAccountModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-account" onsubmit="handleSaveEditAccount(event)" class="flex-1 overflow-y-auto py-4 space-y-4 pr-1 custom-scrollbar">
+        <input type="hidden" id="edit-account-id" value="" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Usuario / Handle <span class="text-red-400">*</span></label>
+            <div class="relative">
+              <span class="absolute left-3 top-2 text-slate-500 font-mono text-xs">@</span>
+              <input type="text" id="edit-username" required class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-7 pr-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Nombre Completo</label>
+            <input type="text" id="edit-fullname" placeholder="Nombre visible" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Email <span class="text-red-400">*</span></label>
+            <input type="email" id="edit-email" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Contraseña <span class="text-red-400">*</span></label>
+            <div class="relative">
+              <input type="text" id="edit-password" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-indigo-300 focus:outline-none focus:border-indigo-500 font-mono pr-8" />
+              <button type="button" onclick="generateRandomPassForEdit()" class="absolute right-2 top-2 text-slate-400 hover:text-indigo-400" title="Generar clave aleatoria">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Fecha de Nacimiento</label>
+            <input type="date" id="edit-birthdate" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Proyecto</label>
+            <input type="text" id="edit-project" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Estado</label>
+            <select id="edit-status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="PENDING">PENDING</option>
+              <option value="SEEDED">SEEDED</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="edit-is-master" class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0">
+          <label for="edit-is-master" class="text-xs text-slate-300 cursor-pointer">
+            Marcar como <strong class="text-amber-400 font-semibold">👑 Cuenta Madre / Master</strong>
+          </label>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between gap-3">
+          <button type="button" onclick="handleDeleteFromEditModal()" class="px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-semibold transition flex items-center gap-1.5">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Cuenta
+          </button>
+          <button type="submit" id="btn-submit-edit-account" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 text-xs">
+            <i data-lucide="check" class="w-4 h-4"></i> Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- CONFIG / MOTOR LOCAL MODAL -->
   <div id="modal-config" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative my-auto max-h-[92vh] flex flex-col">
@@ -848,61 +931,66 @@
         return;
       }
 
-      accounts.forEach(a => {
-        let statusBadge = "";
-        if (a.status === "ACTIVE") {
-          statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVA</span>`;
-        } else if (a.status === "SEEDED") {
-          statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">SEEDED</span>`;
-        } else {
-          statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">PENDIENTE</span>`;
-        }
+        currentAccountsMap = {};
+        accounts.forEach(a => {
+          currentAccountsMap[a.id] = a;
+          let statusBadge = "";
+          if (a.status === "ACTIVE") {
+            statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVA</span>`;
+          } else if (a.status === "SEEDED") {
+            statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">SEEDED</span>`;
+          } else {
+            statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">PENDIENTE</span>`;
+          }
 
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-800/40 transition";
-        tr.innerHTML = `
-          <td class="py-3 px-4 text-slate-400 font-mono text-xs">#${a.id}</td>
-          <td class="py-3 px-4 font-semibold text-slate-200"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs">${a.project_id}</span></td>
-          <td class="py-3 px-4">
-            <div class="font-medium text-white flex items-center gap-1.5">
-              ${a.full_name || a.username}
-              ${a.metadata?.is_master ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold inline-flex items-center gap-1">👑 Master</span>' : ''}
-            </div>
-            <div class="text-xs text-slate-400 font-mono">@${a.username}</div>
-          </td>
-          <td class="py-3 px-4 text-xs font-mono text-slate-300">${a.email}</td>
-          <td class="py-3 px-4 text-xs font-mono">
-            <span class="bg-slate-950 px-2 py-1 rounded border border-slate-800 text-indigo-300 select-all">${a.password}</span>
-          </td>
-          <td class="py-3 px-4">
-            <div class="space-y-1">
-              <div>${statusBadge}</div>
-              ${a.metadata?.registered_platforms && a.metadata.registered_platforms.length > 0 ? `
-                <div class="flex flex-wrap gap-1 mt-1">
-                  ${a.metadata.registered_platforms.map(p => `
-                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700 font-mono">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>${p.name}
-                    </span>
-                  `).join('')}
-                </div>
-              ` : ''}
-            </div>
-          </td>
-          <td class="py-3 px-4 text-right space-y-1">
-            <div class="flex items-center justify-end gap-1.5">
-              ${a.has_session ? `
-                <button onclick="handleOpenSession(${a.id})" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-medium transition inline-flex items-center gap-1" title="Reabrir sesión de navegador con cookies">
-                  <i data-lucide="play-circle" class="w-3.5 h-3.5"></i> Abrir Navegador
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-800/40 transition";
+          tr.innerHTML = `
+            <td class="py-3 px-4 text-slate-400 font-mono text-xs">#${a.id}</td>
+            <td class="py-3 px-4 font-semibold text-slate-200"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs">${a.project_id}</span></td>
+            <td class="py-3 px-4">
+              <div class="font-medium text-white flex items-center gap-1.5">
+                ${a.full_name || a.username}
+                ${a.metadata?.is_master ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold inline-flex items-center gap-1">👑 Master</span>' : ''}
+              </div>
+              <div class="text-xs text-slate-400 font-mono">@${a.username}</div>
+            </td>
+            <td class="py-3 px-4 text-xs font-mono text-slate-300">${a.email}</td>
+            <td class="py-3 px-4 text-xs font-mono">
+              <span class="bg-slate-950 px-2 py-1 rounded border border-slate-800 text-indigo-300 select-all">${a.password}</span>
+            </td>
+            <td class="py-3 px-4">
+              <div class="space-y-1">
+                <div>${statusBadge}</div>
+                ${a.metadata?.registered_platforms && a.metadata.registered_platforms.length > 0 ? `
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    ${a.metadata.registered_platforms.map(p => `
+                      <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>${p.name}
+                      </span>
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            </td>
+            <td class="py-3 px-4 text-right space-y-1">
+              <div class="flex items-center justify-end gap-1.5">
+                ${a.has_session ? `
+                  <button onclick="handleOpenSession(${a.id})" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-medium transition inline-flex items-center gap-1" title="Reabrir sesión de navegador con cookies">
+                    <i data-lucide="play-circle" class="w-3.5 h-3.5"></i> Abrir Navegador
+                  </button>
+                ` : ''}
+                <button onclick="openAssistedModal(currentAccountsMap[${a.id}])" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition inline-flex items-center gap-1 shadow-sm shadow-indigo-600/30" title="Vincular a una nueva red social o plataforma">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> + Red Social
                 </button>
-              ` : ''}
-              <button onclick="openAssistedModal(${JSON.stringify(a).replace(/"/g, '&quot;')})" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition inline-flex items-center gap-1 shadow-sm shadow-indigo-600/30" title="Vincular a una nueva red social o plataforma">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i> + Red Social
-              </button>
-              <button onclick="handleDeleteAccount(${a.id}, '${a.username}')" class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-800 transition" title="Eliminar de la bóveda">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-          </td>
+                <button onclick="openEditAccountModal(${a.id})" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition" title="Editar datos, contraseña o fecha">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="handleDeleteAccount(${a.id}, '${a.username}')" class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-800 transition" title="Eliminar de la bóveda">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </td>
         `;
         tbody.appendChild(tr);
       });
@@ -1160,13 +1248,30 @@
     function openAssistedModal(account) {
       currentAccountId = account.id;
       const fullName = account.full_name || account.username;
+      const bdate = account.metadata?.birth_date || '1996-05-15';
+      let bdateDisplay = bdate;
+      let bdateCopy = bdate;
+      if (bdate && bdate.includes('-')) {
+        const [by, bm, bd] = bdate.split('-');
+        const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const monthName = months[parseInt(bm, 10) - 1] || bm;
+        bdateDisplay = `${parseInt(bd, 10)} / ${monthName} / ${by}`;
+        bdateCopy = `${bd}/${bm}/${by}`;
+      }
+
       document.getElementById("modal-account-summary").innerHTML = `
         <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-800">
           <div>
-            <div class="font-bold text-white text-sm">${fullName}</div>
+            <div class="font-bold text-white text-sm flex items-center gap-1.5">
+              ${fullName}
+              ${account.metadata?.is_master ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold inline-flex items-center gap-1">👑 Master</span>' : ''}
+            </div>
             <div class="text-xs text-slate-400 font-mono">@${account.username}</div>
           </div>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">${account.project_id}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">${account.project_id}</span>
+            <button type="button" onclick="closeAssistedModal(); openEditAccountModal(${account.id})" class="text-xs px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 transition" title="Editar todos los datos">✏️ Editar</button>
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2 mt-2">
@@ -1205,9 +1310,12 @@
 
         <div class="mt-2 flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-800 text-[11px]">
           <div class="text-slate-300">
-            <span class="text-slate-400 font-semibold">Fecha Nac. sugerida:</span> 15 / Mayo / 1996
+            <span class="text-slate-400 font-semibold">Fecha Nac. sugerida:</span> <span class="text-white font-medium">${bdateDisplay}</span>
           </div>
-          <button type="button" onclick="copyModalField('15/05/1996', this)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] transition">Copiar</button>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="copyModalField('${bdateCopy}', this)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] transition">Copiar</button>
+            <button type="button" onclick="closeAssistedModal(); openEditAccountModal(${account.id})" class="px-2 py-0.5 rounded bg-indigo-950 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 text-[10px] transition" title="Cambiar fecha de nacimiento">✏️ Cambiar</button>
+          </div>
         </div>
 
         <p class="text-[11px] text-emerald-400 mt-2 flex items-center gap-1.5">
@@ -1582,6 +1690,113 @@
         loadAccounts();
         loadSummary();
       }
+    }
+
+    function openEditAccountModal(accountId) {
+      const acc = currentAccountsMap[accountId];
+      if (!acc) return;
+      document.getElementById("edit-account-id").value = acc.id;
+      document.getElementById("edit-username").value = acc.username || "";
+      document.getElementById("edit-fullname").value = acc.full_name || "";
+      document.getElementById("edit-email").value = acc.email || "";
+      document.getElementById("edit-password").value = acc.password || "";
+      document.getElementById("edit-birthdate").value = acc.metadata?.birth_date || "";
+      document.getElementById("edit-project").value = acc.project_id || "default";
+      document.getElementById("edit-status").value = acc.status || "ACTIVE";
+      document.getElementById("edit-is-master").checked = Boolean(acc.metadata?.is_master);
+
+      document.getElementById("modal-edit-account").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function closeEditAccountModal() {
+      document.getElementById("modal-edit-account").classList.add("hidden");
+    }
+
+    function generateRandomPassForEdit() {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+      let pass = "";
+      for (let i = 0; i < 16; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById("edit-password").value = pass;
+    }
+
+    async function handleSaveEditAccount(e) {
+      e.preventDefault();
+      const accountId = document.getElementById("edit-account-id").value;
+      const username = document.getElementById("edit-username").value.trim();
+      const fullname = document.getElementById("edit-fullname").value.trim();
+      const email = document.getElementById("edit-email").value.trim();
+      const password = document.getElementById("edit-password").value.trim();
+      const birthdate = document.getElementById("edit-birthdate").value;
+      const project = document.getElementById("edit-project").value.trim() || 'default';
+      const status = document.getElementById("edit-status").value;
+      const isMaster = document.getElementById("edit-is-master").checked;
+
+      const btn = document.getElementById("btn-submit-edit-account");
+      btn.disabled = true;
+
+      const backend = getBackendUrl();
+      if (isConnectedToLocal) {
+        try {
+          const res = await fetch((backend || '') + `/api/accounts/${accountId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: username,
+              full_name: fullname,
+              email: email,
+              password: password,
+              project_id: project,
+              status: status,
+              birth_date: birthdate,
+              metadata: { is_master: isMaster }
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            showToast(`¡Cuenta @${username} actualizada con éxito!`);
+            closeEditAccountModal();
+            loadAccounts();
+            loadSummary();
+          } else {
+            showToast(data.error || "Error al actualizar cuenta", "error");
+          }
+        } catch (err) {
+          showToast("Error de conexión al servidor", "error");
+        } finally {
+          btn.disabled = false;
+        }
+      } else {
+        // Standalone localStorage update
+        let currentList = getLocalAccounts();
+        const idx = currentList.findIndex(a => a.id == accountId);
+        if (idx !== -1) {
+          currentList[idx].username = username;
+          currentList[idx].full_name = fullname;
+          currentList[idx].email = email;
+          currentList[idx].password = password;
+          currentList[idx].project_id = project;
+          currentList[idx].status = status;
+          if (!currentList[idx].metadata) currentList[idx].metadata = {};
+          currentList[idx].metadata.birth_date = birthdate;
+          currentList[idx].metadata.is_master = isMaster;
+          saveLocalAccounts(currentList);
+          showToast(`¡Cuenta @${username} actualizada!`);
+          closeEditAccountModal();
+          loadAccounts();
+          loadSummary();
+        }
+        btn.disabled = false;
+      }
+    }
+
+    async function handleDeleteFromEditModal() {
+      const accountId = document.getElementById("edit-account-id").value;
+      const username = document.getElementById("edit-username").value;
+      closeEditAccountModal();
+      await handleDeleteAccount(accountId, username);
     }
   </script>
 </body>

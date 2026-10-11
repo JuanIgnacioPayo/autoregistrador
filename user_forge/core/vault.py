@@ -201,6 +201,69 @@ class Vault:
             conn.commit()
             return cursor.rowcount > 0
 
+    def update_account(
+        self,
+        account_id: int,
+        username: Optional[str] = None,
+        email: Optional[str] = None,
+        password: Optional[str] = None,
+        full_name: Optional[str] = None,
+        project_id: Optional[str] = None,
+        status: Optional[str] = None,
+        birth_date: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> Optional[Account]:
+        account = self.get_account_by_id(account_id)
+        if not account:
+            return None
+
+        fields = []
+        params = []
+
+        if username is not None:
+            fields.append("username = ?")
+            params.append(username)
+
+        if email is not None:
+            fields.append("email = ?")
+            params.append(email)
+
+        if password:
+            enc_pass = self.encrypt(password)
+            fields.append("password_encrypted = ?")
+            params.append(enc_pass)
+
+        if full_name is not None:
+            fields.append("full_name = ?")
+            params.append(full_name)
+
+        if project_id is not None:
+            fields.append("project_id = ?")
+            params.append(project_id)
+
+        if status is not None:
+            fields.append("status = ?")
+            params.append(status)
+
+        meta = account.metadata or {}
+        if birth_date is not None:
+            meta["birth_date"] = birth_date
+        if metadata:
+            meta.update(metadata)
+
+        fields.append("metadata_json = ?")
+        params.append(json.dumps(meta))
+
+        fields.append("updated_at = CURRENT_TIMESTAMP")
+        params.append(account_id)
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(f"UPDATE accounts SET {', '.join(fields)} WHERE id = ?", tuple(params))
+            conn.commit()
+
+        return self.get_account_by_id(account_id)
+
     def update_account_metadata(self, account_id: int, new_metadata: Dict[str, Any]) -> bool:
         account = self.get_account_by_id(account_id)
         if not account:
