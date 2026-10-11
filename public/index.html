@@ -1196,8 +1196,9 @@
         });
         const data = await res.json();
         if (data.success) {
-          if (data.mode === "system_default") {
-            showToast("¡Enlace abierto en tu navegador y email copiado al portapapeles!");
+          if (data.mode === "system_default" || browserChannel === "system_default") {
+            window.open(url, '_blank');
+            showToast("¡Enlace abierto en tu navegador y datos copiados al portapapeles!");
             launchBtn.disabled = false;
             launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir de Nuevo`;
             lucide.createIcons();
