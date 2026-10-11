@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UserForge Dashboard — Identity & Account Hub</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.7); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- TOP NAVBAR -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 min-h-16 py-2.5 sm:py-0 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-2.5">
+        <div class="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+          <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i>
+        </div>
+        <div>
+          <span class="text-base sm:text-lg font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">UserForge</span>
+          <span class="text-[10px] sm:text-xs ml-1.5 px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-medium">Hub</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-1.5 sm:space-x-3 text-xs sm:text-sm overflow-x-auto max-w-full no-scrollbar py-1">
+        <button onclick="switchTab('personas')" class="tab-btn px-3 sm:px-4 py-2 rounded-lg font-medium transition text-indigo-400 bg-indigo-950/50 border border-indigo-800/50 flex items-center gap-1.5 shrink-0" id="tab-btn-personas">
+          <i data-lucide="user-plus" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> Generador
+        </button>
+        <button onclick="switchTab('seeder')" class="tab-btn px-3 sm:px-4 py-2 rounded-lg font-medium transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 flex items-center gap-1.5 shrink-0" id="tab-btn-seeder">
+          <i data-lucide="database" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> Seeder
+        </button>
+        <button onclick="switchTab('vault')" class="tab-btn px-3 sm:px-4 py-2 rounded-lg font-medium transition text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 flex items-center gap-1.5 shrink-0" id="tab-btn-vault">
+          <i data-lucide="key-round" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> Bóveda
+        </button>
+        <div class="h-4 w-[1px] bg-slate-800 shrink-0"></div>
+        <button onclick="openExportModal()" class="px-2.5 sm:px-3.5 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/60 font-medium transition flex items-center gap-1.5 shrink-0">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- METRICS STRIP -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Total Cuentas</p>
+          <p class="text-2xl font-bold mt-1 text-white" id="stat-total">0</p>
+        </div>
+        <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl">
+          <i data-lucide="users" class="w-5 h-5"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Proyectos Activos</p>
+          <p class="text-2xl font-bold mt-1 text-white" id="stat-projects">0</p>
+        </div>
+        <div class="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl">
+          <i data-lucide="layers" class="w-5 h-5"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Cuentas Activas / Sesión</p>
+          <p class="text-2xl font-bold mt-1 text-emerald-400" id="stat-active">0</p>
+        </div>
+        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
+          <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Seeders DB Realizados</p>
+          <p class="text-2xl font-bold mt-1 text-amber-400" id="stat-seeded">0</p>
+        </div>
+        <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
+          <i data-lucide="hard-drive" class="w-5 h-5"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: PERSONAS GENERATOR -->
+    <section id="tab-personas" class="tab-content space-y-6">
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-7 shadow-xl">
+        <div class="flex items-center justify-between mb-6 pb-5 border-b border-slate-800/80">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-5 h-5 text-indigo-400"></i>
+              Generador de Identidades & Personas
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">Crea identidades verosímiles y completas con localización argentina (es_AR), aliases de email y contraseñas seguras.</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300">Faker es_AR + Encryption Fernet</span>
+        </div>
+
+        <form id="form-generate" onsubmit="handleGenerate(event)" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Nombre del Proyecto / Tag *</label>
+            <input type="text" id="gen-project" required value="salieris" placeholder="ej: salieris, portal2, tienda" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+            <p class="text-xs text-slate-500 mt-1.5">Agrupa todos los usuarios generados bajo este tag.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Cantidad de Personas *</label>
+            <input type="number" id="gen-count" required min="1" max="50" value="3" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+            <p class="text-xs text-slate-500 mt-1.5">Lotes de 1 a 50 por tirada.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Rol o Flavor de Bio</label>
+            <input type="text" id="gen-role" placeholder="ej: Diseñador UI, Growth Hacker, Redactor" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+            <p class="text-xs text-slate-500 mt-1.5">Guía temática para la bio del perfil.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Dominio de Email</label>
+            <input type="text" id="gen-domain" placeholder="example.com" value="example.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+            <p class="text-xs text-slate-500 mt-1.5">Tu dominio con catch-all o wildcard activado.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Estrategia de Email</label>
+            <select id="gen-strategy" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition text-slate-200">
+              <option value="plus">Plus-addressing (user+alias@dominio)</option>
+              <option value="direct">Catch-all directo (alias@dominio)</option>
+            </select>
+            <p class="text-xs text-slate-500 mt-1.5">Ideal para Gmail/Fastmail/Cloudflare Routing.</p>
+          </div>
+
+          <div class="flex items-end">
+            <button type="submit" id="btn-gen-submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-semibold py-2.5 px-6 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+              <i data-lucide="wand-2" class="w-4 h-4"></i> Generar & Guardar en Bóveda
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- RECENTLY GENERATED CARDS -->
+      <div id="gen-results-container" class="hidden space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+          Últimas Identidades Creadas
+        </h3>
+        <div id="gen-cards-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SEEDERS -->
+    <section id="tab-seeder" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- SQL SEEDER -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-7 shadow-xl">
+          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-800">
+            <div class="p-2.5 bg-blue-500/10 text-blue-400 rounded-xl">
+              <i data-lucide="database" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-white">Seeder SQL / SQLite</h3>
+              <p class="text-xs text-slate-400">Inserta usuarios directamente con contraseñas hasheadas en <code class="text-blue-300">bcrypt</code>.</p>
+            </div>
+          </div>
+
+          <form onsubmit="handleSeedSQL(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Proyecto</label>
+              <input type="text" id="sql-project" required value="salieris" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Ruta de Base de Datos SQLite o URI</label>
+              <input type="text" id="sql-db-path" required value="salieris_app.db" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition font-mono" />
+              <p class="text-xs text-slate-500 mt-1">Si el archivo no existe, lo crea automáticamente.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Tabla Destino</label>
+                <input type="text" id="sql-table" required value="users" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition font-mono" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Cantidad</label>
+                <input type="number" id="sql-count" min="1" max="100" value="5" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+              </div>
+            </div>
+
+            <button type="submit" id="btn-seed-sql" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2">
+              <i data-lucide="play" class="w-4 h-4"></i> Ejecutar Seeder SQL
+            </button>
+          </form>
+        </div>
+
+        <!-- SUPABASE SEEDER -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-7 shadow-xl">
+          <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-800">
+            <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl">
+              <i data-lucide="flame" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-white">Seeder Supabase Auth</h3>
+              <p class="text-xs text-slate-400">Inserta usuarios mediante GoTrue Admin API con confirmación de email automática.</p>
+            </div>
+          </div>
+
+          <form onsubmit="handleSeedSupabase(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Proyecto</label>
+              <input type="text" id="supa-project" required value="salieris" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Supabase Project URL</label>
+              <input type="url" id="supa-url" placeholder="https://your-project.supabase.co" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition font-mono" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Service Role Secret Key</label>
+              <input type="password" id="supa-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition font-mono" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Cantidad</label>
+              <input type="number" id="supa-count" min="1" max="50" value="5" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition" />
+            </div>
+
+            <button type="submit" id="btn-seed-supa" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+              <i data-lucide="send" class="w-4 h-4"></i> Sembrar Usuarios en Supabase
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: IDENTITY VAULT -->
+    <section id="tab-vault" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="vault" class="w-5 h-5 text-indigo-400"></i>
+              Bóveda Local Cifrada de Identidades
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">Todas las credenciales están cifradas en disco con Fernet. Desde acá podés abrir perfiles de navegador aislados o lanzar registros.</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <select id="filter-project" onchange="loadAccounts()" class="bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+              <option value="">Todos los Proyectos</option>
+            </select>
+            <select id="filter-status" onchange="loadAccounts()" class="bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+              <option value="">Todos los Estados</option>
+              <option value="PENDING">PENDING</option>
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="SEEDED">SEEDED</option>
+            </select>
+            <button onclick="loadAccounts()" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ACCOUNTS TABLE -->
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-800">
+              <tr>
+                <th class="py-3.5 px-4">ID</th>
+                <th class="py-3.5 px-4">Proyecto</th>
+                <th class="py-3.5 px-4">Persona</th>
+                <th class="py-3.5 px-4">Email Alias</th>
+                <th class="py-3.5 px-4">Contraseña</th>
+                <th class="py-3.5 px-4">Estado</th>
+                <th class="py-3.5 px-4 text-right">Acciones Playwright</th>
+              </tr>
+            </thead>
+            <tbody id="accounts-table-body" class="divide-y divide-slate-800/60 bg-slate-900/30">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ASSISTED REGISTRATION MODAL -->
+  <div id="modal-assisted" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-start sm:items-center justify-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl relative my-auto max-h-[94vh] flex flex-col">
+      <!-- FIXED MODAL HEADER -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 shrink-0">
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <div class="p-2 sm:p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl">
+            <i data-lucide="globe" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-white">Registro Asistido con Perfil Aislado</h3>
+            <p class="text-[11px] sm:text-xs text-slate-400">Playwright o tu navegador abrirán un perfil anti-bloqueo.</p>
+          </div>
+        </div>
+        <button onclick="closeAssistedModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- SCROLLABLE MODAL BODY -->
+      <div class="flex-1 overflow-y-auto py-3 space-y-4 pr-1 custom-scrollbar">
+        <div id="modal-account-summary" class="bg-slate-950 p-3 sm:p-4 rounded-xl border border-slate-800 text-xs space-y-1.5">
+          <!-- Rendered via JS -->
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Elegir Plataforma Rápida o Personalizada</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
+            <button type="button" onclick="selectPlatformPreset('Reddit', 'https://www.reddit.com/register/')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-orange-500 rounded-xl text-left transition group">
+              <span class="block text-xs font-bold text-slate-200 group-hover:text-orange-400">Reddit</span>
+              <span class="text-[10px] text-slate-500">reddit.com</span>
+            </button>
+            <button type="button" onclick="selectPlatformPreset('Twitter / X', 'https://x.com/i/flow/signup')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-sky-500 rounded-xl text-left transition group">
+              <span class="block text-xs font-bold text-slate-200 group-hover:text-sky-400">X (Twitter)</span>
+              <span class="text-[10px] text-slate-500">x.com</span>
+            </button>
+            <button type="button" onclick="selectPlatformPreset('GitHub', 'https://github.com/signup')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-purple-500 rounded-xl text-left transition group">
+              <span class="block text-xs font-bold text-slate-200 group-hover:text-purple-400">GitHub</span>
+              <span class="text-[10px] text-slate-500">github.com</span>
+            </button>
+            <button type="button" onclick="selectPlatformPreset('Instagram', 'https://www.instagram.com/accounts/emailsignup/')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-pink-500 rounded-xl text-left transition group">
+              <span class="block text-xs font-bold text-slate-200 group-hover:text-pink-400">Instagram</span>
+              <span class="text-[10px] text-slate-500">instagram.com</span>
+            </button>
+            <button type="button" onclick="selectPlatformPreset('Discord', 'https://discord.com/register')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-indigo-500 rounded-xl text-left transition group">
+              <span class="block text-xs font-bold text-slate-200 group-hover:text-indigo-400">Discord</span>
+              <span class="text-[10px] text-slate-500">discord.com</span>
+            </button>
+            <button type="button" onclick="selectPlatformPreset('Personalizada', '')" class="p-2.5 bg-slate-950 border border-slate-800 hover:border-slate-500 rounded-xl text-left transition group">
+              <span class="block text-xs font-bold text-slate-200 group-hover:text-slate-100">Otra web</span>
+              <span class="text-[10px] text-slate-500">Pega tu URL</span>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 mb-1.5">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">URL de Registro en la Plataforma</label>
+            <span id="badge-selected-platform" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hidden"></span>
+          </div>
+          <input type="url" id="assisted-target-url" placeholder="https://ejemplo.com/signup" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition font-mono mb-3" />
+          <input type="hidden" id="assisted-platform-name" value="" />
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Elegir Navegador / Modo de Apertura</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-indigo-500/50 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
+                <input type="radio" name="browser-channel" value="chrome" checked class="text-indigo-600 focus:ring-0">
+                <div>
+                  <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="globe" class="w-3.5 h-3.5 text-indigo-400"></i> Google Chrome</span>
+                  <span class="text-[10px] text-slate-400">Oficial instalado (Recomendado)</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
+                <input type="radio" name="browser-channel" value="msedge" class="text-indigo-600 focus:ring-0">
+                <div>
+                  <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="compass" class="w-3.5 h-3.5 text-sky-400"></i> Microsoft Edge</span>
+                  <span class="text-[10px] text-slate-400">Nativo Windows (Ultra estable)</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
+                <input type="radio" name="browser-channel" value="system_default" class="text-indigo-600 focus:ring-0">
+                <div>
+                  <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-400"></i> Modo Directo (1-Clic)</span>
+                  <span class="text-[10px] text-slate-400">Abre en tu navegador actual</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
+                <input type="radio" name="browser-channel" value="chromium" class="text-indigo-600 focus:ring-0">
+                <div>
+                  <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5 text-amber-400"></i> Chromium Sandbox</span>
+                  <span class="text-[10px] text-slate-400">Instancia Playwright aislada</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROGRESS / INSTRUCTIONS BOX -->
+        <div id="assisted-progress-box" class="hidden bg-indigo-950/30 border border-indigo-500/30 rounded-xl p-3.5 text-xs space-y-2.5">
+          <div class="flex items-center gap-2 text-indigo-300 font-semibold">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+            </span>
+            <span id="assisted-step-label">Lanzando navegador...</span>
+          </div>
+
+          <div class="bg-slate-950/80 p-3 rounded-lg border border-slate-800 text-slate-300 space-y-1">
+            <p class="font-medium text-amber-300">💡 Instrucciones para vos en la ventana:</p>
+            <ol class="list-decimal list-inside space-y-1 text-slate-400">
+              <li>El formulario se rellenará solo con los datos de esta persona.</li>
+              <li>Si aparece un <b class="text-white">CAPTCHA</b> o te pide un <b class="text-white">código de SMS</b>, completalo en la ventana.</li>
+              <li>Cuando termines el registro, hacé clic en el botón verde de abajo para guardar la sesión.</li>
+            </ol>
+          </div>
+
+          <button onclick="handleSaveSessionConfirm()" id="btn-save-session" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+            <i data-lucide="check" class="w-4 h-4"></i> Ya terminé el registro: Guardar Sesión Permanente
+          </button>
+        </div>
+      </div>
+
+      <!-- FIXED MODAL FOOTER (ALWAYS VISIBLE WITHOUT SCROLLING!) -->
+      <div class="pt-3 border-t border-slate-800/80 shrink-0">
+        <div id="assisted-action-btn">
+          <button onclick="handleStartAssisted()" id="btn-launch-browser" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+            <i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT MODAL -->
+  <div id="modal-export" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative my-auto max-h-[92vh] flex flex-col">
+      <!-- FIXED HEADER -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 shrink-0">
+        <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="download" class="w-5 h-5 text-indigo-400"></i> Exportar Credenciales
+        </h3>
+        <button onclick="closeExportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- SCROLLABLE BODY -->
+      <div class="flex-1 overflow-y-auto py-4 space-y-4 pr-1 custom-scrollbar">
+        <p class="text-xs text-slate-400">Descarga tus usuarios y contraseñas desencriptadas para automatizaciones o tu gestor personal.</p>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Filtrar por Proyecto (opcional)</label>
+          <input type="text" id="export-project" placeholder="Dejar vacío para todos" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Formato de Exportación</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="triggerExport('json')" class="p-3 bg-slate-950 border border-slate-800 hover:border-indigo-500 rounded-xl text-center group transition">
+              <span class="block text-sm font-bold text-slate-200 group-hover:text-indigo-400">JSON</span>
+              <span class="text-[10px] text-slate-500">API / Scripts</span>
+            </button>
+            <button onclick="triggerExport('csv')" class="p-3 bg-slate-950 border border-slate-800 hover:border-indigo-500 rounded-xl text-center group transition">
+              <span class="block text-sm font-bold text-slate-200 group-hover:text-indigo-400">CSV</span>
+              <span class="text-[10px] text-slate-500">Excel / Tablas</span>
+            </button>
+            <button onclick="triggerExport('bitwarden')" class="p-3 bg-slate-950 border border-slate-800 hover:border-indigo-500 rounded-xl text-center group transition">
+              <span class="block text-sm font-bold text-slate-200 group-hover:text-indigo-400">Bitwarden</span>
+              <span class="text-[10px] text-slate-500">1Password / BW</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden bg-slate-900 border border-slate-700 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 transition">
+    <div id="toast-icon"></div>
+    <div id="toast-message" class="text-sm font-medium"></div>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    let currentAccountId = null;
+    let pollInterval = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      loadSummary();
+      loadAccounts();
+    });
+
+    function showToast(msg, type = "success") {
+      const toast = document.getElementById("toast");
+      const msgEl = document.getElementById("toast-message");
+      const iconEl = document.getElementById("toast-icon");
+      
+      msgEl.innerText = msg;
+      if (type === "success") {
+        iconEl.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>`;
+      } else {
+        iconEl.innerHTML = `<i data-lucide="alert-triangle" class="w-5 h-5 text-red-400"></i>`;
+      }
+      toast.classList.remove("hidden");
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 4000);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+      document.querySelectorAll(".tab-btn").forEach(el => {
+        el.classList.remove("text-indigo-400", "bg-indigo-950/50", "border-indigo-800/50");
+        el.classList.add("text-slate-400");
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      activeBtn.classList.remove("text-slate-400");
+      activeBtn.classList.add("text-indigo-400", "bg-indigo-950/50", "border-indigo-800/50");
+
+      if (tabId === "vault") {
+        loadAccounts();
+      }
+      lucide.createIcons();
+    }
+
+    async function loadSummary() {
+      try {
+        const res = await fetch("/api/summary");
+        const data = await res.json();
+        document.getElementById("stat-total").innerText = data.total_accounts;
+        document.getElementById("stat-projects").innerText = data.projects_count;
+        document.getElementById("stat-active").innerText = data.status_counts["ACTIVE"] || 0;
+        document.getElementById("stat-seeded").innerText = data.status_counts["SEEDED"] || 0;
+
+        // Populate projects select filter
+        const select = document.getElementById("filter-project");
+        select.innerHTML = '<option value="">Todos los Proyectos</option>';
+        data.projects.forEach(p => {
+          select.innerHTML += `<option value="${p}">${p}</option>`;
+        });
+      } catch (err) {
+        console.error("Error loading summary:", err);
+      }
+    }
+
+    async function loadAccounts() {
+      const proj = document.getElementById("filter-project").value;
+      const status = document.getElementById("filter-status").value;
+      
+      let url = "/api/accounts?";
+      if (proj) url += `project=${encodeURIComponent(proj)}&`;
+      if (status) url += `status=${encodeURIComponent(status)}&`;
+
+      try {
+        const res = await fetch(url);
+        const accounts = await res.json();
+        const tbody = document.getElementById("accounts-table-body");
+        tbody.innerHTML = "";
+
+        if (accounts.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500">No se encontraron cuentas en la bóveda con esos filtros.</td></tr>`;
+          return;
+        }
+
+        accounts.forEach(a => {
+          let statusBadge = "";
+          if (a.status === "ACTIVE") {
+            statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVA</span>`;
+          } else if (a.status === "SEEDED") {
+            statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">SEEDED</span>`;
+          } else {
+            statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">PENDIENTE</span>`;
+          }
+
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-800/40 transition";
+          tr.innerHTML = `
+            <td class="py-3 px-4 text-slate-400 font-mono text-xs">#${a.id}</td>
+            <td class="py-3 px-4 font-semibold text-slate-200"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs">${a.project_id}</span></td>
+            <td class="py-3 px-4">
+              <div class="font-medium text-white">${a.full_name || a.username}</div>
+              <div class="text-xs text-slate-400 font-mono">@${a.username}</div>
+            </td>
+            <td class="py-3 px-4 text-xs font-mono text-slate-300">${a.email}</td>
+            <td class="py-3 px-4 text-xs font-mono">
+              <span class="bg-slate-950 px-2 py-1 rounded border border-slate-800 text-indigo-300 select-all">${a.password}</span>
+            </td>
+            <td class="py-3 px-4">
+              <div class="space-y-1">
+                <div>${statusBadge}</div>
+                ${a.metadata?.registered_platforms && a.metadata.registered_platforms.length > 0 ? `
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    ${a.metadata.registered_platforms.map(p => `
+                      <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>${p.name}
+                      </span>
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            </td>
+            <td class="py-3 px-4 text-right space-y-1">
+              <div class="flex items-center justify-end gap-1.5">
+                ${a.has_session ? `
+                  <button onclick="handleOpenSession(${a.id})" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-medium transition inline-flex items-center gap-1" title="Reabrir sesión de navegador con cookies">
+                    <i data-lucide="play-circle" class="w-3.5 h-3.5"></i> Abrir Navegador
+                  </button>
+                ` : ''}
+                <button onclick="openAssistedModal(${JSON.stringify(a).replace(/"/g, '&quot;')})" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition inline-flex items-center gap-1 shadow-sm shadow-indigo-600/30" title="Vincular a una nueva red social o plataforma">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> + Red Social
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Error loading accounts:", err);
+      }
+    }
+
+    async function handleGenerate(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btn-gen-submit");
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Generando identidades...`;
+      lucide.createIcons();
+
+      const payload = {
+        project: document.getElementById("gen-project").value,
+        count: parseInt(document.getElementById("gen-count").value),
+        role_hint: document.getElementById("gen-role").value,
+        email_domain: document.getElementById("gen-domain").value,
+        email_strategy: document.getElementById("gen-strategy").value
+      };
+
+      try {
+        const res = await fetch("/api/personas/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`¡Se crearon ${data.count} personas y se guardaron en la bóveda!`);
+          renderGenCards(data.accounts);
+          loadSummary();
+        } else {
+          showToast("Error al generar personas", "error");
+        }
+      } catch (err) {
+        showToast("Error de conexión", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="wand-2" class="w-4 h-4"></i> Generar & Guardar en Bóveda`;
+        lucide.createIcons();
+      }
+    }
+
+    function renderGenCards(accounts) {
+      const container = document.getElementById("gen-results-container");
+      const grid = document.getElementById("gen-cards-grid");
+      grid.innerHTML = "";
+      container.classList.remove("hidden");
+
+      accounts.forEach(a => {
+        const card = document.createElement("div");
+        card.className = "bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2.5";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">${a.project_id}</span>
+            <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">#${a.id}</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-base">${a.full_name}</h4>
+            <p class="text-xs text-slate-400 font-mono">@${a.username}</p>
+          </div>
+          <div class="text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800/80 space-y-1">
+            <div class="text-slate-300 truncate"><b class="text-slate-400">Email:</b> ${a.email}</div>
+            <div class="text-indigo-300 font-mono select-all"><b class="text-slate-400">Pass:</b> ${a.password}</div>
+          </div>
+          <p class="text-[11px] text-slate-400 italic line-clamp-2">"${a.bio || 'Sin bio'}"</p>
+          <div class="pt-2 border-t border-slate-800 flex justify-end">
+            <button onclick="openAssistedModal(${JSON.stringify(a).replace(/"/g, '&quot;')})" class="w-full text-center py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition">
+              Iniciar Registro Asistido
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    async function handleSeedSQL(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btn-seed-sql");
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sembrando en SQL...`;
+      lucide.createIcons();
+
+      const payload = {
+        project: document.getElementById("sql-project").value,
+        db_path: document.getElementById("sql-db-path").value,
+        table: document.getElementById("sql-table").value,
+        count: parseInt(document.getElementById("sql-count").value)
+      };
+
+      try {
+        const res = await fetch("/api/seed/sql", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`¡Se sembraron ${data.seeded_count} usuarios con contraseñas bcrypt en ${data.db_path}!`);
+          loadSummary();
+        } else {
+          showToast("Error al sembrar en base SQL", "error");
+        }
+      } catch (err) {
+        showToast("Error al ejecutar seeder", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Ejecutar Seeder SQL`;
+        lucide.createIcons();
+      }
+    }
+
+    async function handleSeedSupabase(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btn-seed-supa");
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Conectando a Supabase...`;
+      lucide.createIcons();
+
+      const payload = {
+        project: document.getElementById("supa-project").value,
+        url: document.getElementById("supa-url").value,
+        key: document.getElementById("supa-key").value,
+        count: parseInt(document.getElementById("supa-count").value)
+      };
+
+      try {
+        const res = await fetch("/api/seed/supabase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`¡Se crearon ${data.seeded_count} usuarios verificados en Supabase Auth!`);
+          loadSummary();
+        } else {
+          showToast(data.error || "Error al conectar con Supabase", "error");
+        }
+      } catch (err) {
+        showToast("Error de conexión a Supabase", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Sembrar Usuarios en Supabase`;
+        lucide.createIcons();
+      }
+    }
+
+    function selectPlatformPreset(name, url) {
+      const urlInput = document.getElementById("assisted-target-url");
+      const nameInput = document.getElementById("assisted-platform-name");
+      const badge = document.getElementById("badge-selected-platform");
+      
+      urlInput.value = url;
+      nameInput.value = name;
+      
+      if (name) {
+        badge.innerText = name;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
+      
+      if (!url) {
+        urlInput.focus();
+      }
+    }
+
+    function copyModalField(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = '✓ Copiado';
+        btn.style.background = '#059669';
+        setTimeout(() => {
+          btn.innerText = orig;
+          btn.style.background = '';
+        }, 1500);
+      });
+    }
+
+    function openAssistedModal(account) {
+      currentAccountId = account.id;
+      const fullName = account.full_name || account.username;
+      document.getElementById("modal-account-summary").innerHTML = `
+        <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-800">
+          <div>
+            <div class="font-bold text-white text-sm">${fullName}</div>
+            <div class="text-xs text-slate-400 font-mono">@${account.username}</div>
+          </div>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">${account.project_id}</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mt-2">
+          <div class="flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="truncate pr-1">
+              <span class="text-[10px] text-slate-400 block font-semibold">NOMBRE</span>
+              <span class="text-xs text-white truncate block">${fullName}</span>
+            </div>
+            <button type="button" onclick="copyModalField('${fullName}', this)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0">Copiar</button>
+          </div>
+
+          <div class="flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="truncate pr-1">
+              <span class="text-[10px] text-slate-400 block font-semibold">USUARIO</span>
+              <span class="text-xs text-indigo-300 font-mono truncate block">@${account.username}</span>
+            </div>
+            <button type="button" onclick="copyModalField('${account.username}', this)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0">Copiar</button>
+          </div>
+
+          <div class="flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="truncate pr-1">
+              <span class="text-[10px] text-slate-400 block font-semibold">EMAIL</span>
+              <span class="text-xs text-slate-200 font-mono truncate block">${account.email}</span>
+            </div>
+            <button type="button" onclick="copyModalField('${account.email}', this)" class="px-2 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition shrink-0">Copiar</button>
+          </div>
+
+          <div class="flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-800">
+            <div class="truncate pr-1">
+              <span class="text-[10px] text-slate-400 block font-semibold">CLAVE</span>
+              <span class="text-xs text-indigo-300 font-mono truncate block">${account.password}</span>
+            </div>
+            <button type="button" onclick="copyModalField('${account.password}', this)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0">Copiar</button>
+          </div>
+        </div>
+
+        <div class="mt-2 flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-800 text-[11px]">
+          <div class="text-slate-300">
+            <span class="text-slate-400 font-semibold">Fecha Nac. sugerida:</span> 15 / Mayo / 1996
+          </div>
+          <button type="button" onclick="copyModalField('15/05/1996', this)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] transition">Copiar</button>
+        </div>
+
+        <p class="text-[11px] text-emerald-400 mt-2 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          Al abrir el navegador, el email ya estará en tu portapapeles (Ctrl+V) y verás la barra UserForge Copilot arriba.
+        </p>
+      `;
+      // Reset preset selection and buttons
+      selectPlatformPreset('', '');
+      document.getElementById("assisted-target-url").value = "";
+      document.getElementById("assisted-progress-box").classList.add("hidden");
+      const launchBtn = document.getElementById("btn-launch-browser");
+      launchBtn.disabled = false;
+      launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos`;
+      document.getElementById("assisted-action-btn").classList.remove("hidden");
+      document.getElementById("modal-assisted").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function closeAssistedModal() {
+      document.getElementById("modal-assisted").classList.add("hidden");
+      if (pollInterval) clearInterval(pollInterval);
+    }
+
+    async function handleStartAssisted() {
+      const url = document.getElementById("assisted-target-url").value.trim();
+      const platformName = document.getElementById("assisted-platform-name").value.trim();
+      const browserChannel = document.querySelector('input[name="browser-channel"]:checked')?.value || 'chrome';
+
+      if (!url) {
+        showToast("Por favor elegí una plataforma o ingresá la URL del registro", "error");
+        return;
+      }
+
+      const launchBtn = document.getElementById("btn-launch-browser");
+      launchBtn.disabled = true;
+      launchBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Abriendo navegador con perfil aislado...`;
+      lucide.createIcons();
+
+      try {
+        const res = await fetch("/api/browser/start-assisted", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            account_id: currentAccountId,
+            url: url,
+            platform_name: platformName,
+            browser_channel: browserChannel
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (data.mode === "system_default") {
+            showToast("¡Enlace abierto en tu navegador y email copiado al portapapeles!");
+            launchBtn.disabled = false;
+            launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir de Nuevo`;
+            lucide.createIcons();
+            return;
+          }
+          document.getElementById("assisted-action-btn").classList.add("hidden");
+          document.getElementById("assisted-progress-box").classList.remove("hidden");
+          startPollingStatus(currentAccountId);
+        } else {
+          showToast(data.error || "No se pudo iniciar el navegador", "error");
+          launchBtn.disabled = false;
+        }
+      } catch (err) {
+        showToast("Error de conexión al servidor", "error");
+        launchBtn.disabled = false;
+      }
+    }
+
+    function startPollingStatus(accountId) {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/browser/session-status/${accountId}`);
+          const data = await res.json();
+          if (data.active) {
+            document.getElementById("assisted-step-label").innerText = data.step || "Trabajando en el navegador...";
+            if (data.status === "IDLE" || data.status === "ERROR") {
+              const launchBtn = document.getElementById("btn-launch-browser");
+              launchBtn.disabled = false;
+              launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos`;
+              document.getElementById("assisted-action-btn").classList.remove("hidden");
+              lucide.createIcons();
+            }
+          } else {
+            const launchBtn = document.getElementById("btn-launch-browser");
+            launchBtn.disabled = false;
+            launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos`;
+            document.getElementById("assisted-action-btn").classList.remove("hidden");
+            lucide.createIcons();
+          }
+        } catch (e) {}
+      }, 2000);
+    }
+
+    async function handleSaveSessionConfirm() {
+      const btn = document.getElementById("btn-save-session");
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Guardando cookies y cerrando...`;
+      lucide.createIcons();
+
+      try {
+        const res = await fetch("/api/browser/save-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ account_id: currentAccountId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast("¡Sesión guardada con éxito! La cuenta ahora está ACTIVA.");
+          closeAssistedModal();
+          loadAccounts();
+          loadSummary();
+        } else {
+          showToast(data.error || "Error al guardar la sesión", "error");
+        }
+      } catch (err) {
+        showToast("Error al guardar sesión", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Ya terminé el registro: Guardar Sesión Permanente`;
+        lucide.createIcons();
+      }
+    }
+
+    async function handleOpenSession(accountId) {
+      showToast("Abriendo navegador con sesión pre-cargada...");
+      try {
+        const res = await fetch("/api/browser/open-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ account_id: accountId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast("Navegador abierto con cookies y sesión activa");
+        }
+      } catch (err) {
+        showToast("Error al abrir sesión", "error");
+      }
+    }
+
+    function openExportModal() {
+      document.getElementById("modal-export").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function closeExportModal() {
+      document.getElementById("modal-export").classList.add("hidden");
+    }
+
+    function triggerExport(format) {
+      const project = document.getElementById("export-project").value.trim();
+      let url = `/api/export?format=${format}`;
+      if (project) url += `&project=${encodeURIComponent(project)}`;
+      window.open(url, "_blank");
+      closeExportModal();
+    }
+  </script>
+</body>
+</html>

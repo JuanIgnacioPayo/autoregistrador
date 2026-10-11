@@ -1,0 +1,38 @@
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sensitive data / Vault / Credentials
+vault_data/
+*.key
+*.db
+*.sqlite3
+
+# Temporary / Scratch files & browser profile caches
+scratch/
+test_prof/
+browser_profiles/
+
+# Firebase local cache
+.firebase/
+
+# IDE / OS specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+.DS_Store
