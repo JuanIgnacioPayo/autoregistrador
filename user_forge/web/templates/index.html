@@ -272,8 +272,12 @@
               <option value="ACTIVE">ACTIVE</option>
               <option value="SEEDED">SEEDED</option>
             </select>
-            <button onclick="loadAccounts()" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition">
+            <button onclick="loadAccounts()" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 transition" title="Refrescar lista">
               <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+            <button onclick="openAddAccountModal()" class="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/30 transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>+ Agregar Cuenta</span>
             </button>
           </div>
         </div>
@@ -477,6 +481,86 @@
     </div>
   </div>
 
+  <!-- ADD ACCOUNT MODAL -->
+  <div id="modal-add-account" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative my-auto max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 shrink-0">
+        <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-5 h-5 text-indigo-400"></i> Agregar Cuenta a la Bóveda
+        </h3>
+        <button onclick="closeAddAccountModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-add-account" onsubmit="handleManualAddAccount(event)" class="flex-1 overflow-y-auto py-4 space-y-4 pr-1 custom-scrollbar">
+        <p class="text-xs text-slate-400">Guardá tu cuenta madre existente o credenciales creadas a mano. Quedarán cifradas con Fernet en tu bóveda local.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Email <span class="text-red-400">*</span></label>
+            <input type="email" id="add-email" required placeholder="proyecto.beta.de@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Usuario / Handle <span class="text-red-400">*</span></label>
+            <input type="text" id="add-username" required placeholder="sin @" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Nombre Completo / Alias</label>
+            <input type="text" id="add-fullname" placeholder="Ej: Cuenta Madre (Proyecto Beta)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Contraseña <span class="text-red-400">*</span></label>
+            <div class="relative">
+              <input type="text" id="add-password" required placeholder="Clave secreta" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-indigo-300 focus:outline-none focus:border-indigo-500 font-mono pr-8" />
+              <button type="button" onclick="generateRandomPassForAdd()" class="absolute right-2 top-2 text-slate-400 hover:text-indigo-400" title="Generar clave aleatoria">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Proyecto</label>
+            <input type="text" id="add-project" value="salieris" placeholder="salieris" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Plataforma</label>
+            <select id="add-platform" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+              <option value="twitter">Twitter / X</option>
+              <option value="google">Google</option>
+              <option value="custom">General / Custom</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Estado</label>
+            <select id="add-status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="PENDING">PENDING</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="add-is-master" checked class="rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-0">
+          <label for="add-is-master" class="text-xs text-slate-300 cursor-pointer">
+            Marcar como <strong class="text-amber-400 font-semibold">👑 Cuenta Madre / Master</strong>
+          </label>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="btn-submit-add-account" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 text-xs">
+            <i data-lucide="check" class="w-4 h-4"></i> Guardar en Bóveda Cifrada
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 hidden bg-slate-900 border border-slate-700 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 transition">
     <div id="toast-icon"></div>
@@ -586,7 +670,10 @@
             <td class="py-3 px-4 text-slate-400 font-mono text-xs">#${a.id}</td>
             <td class="py-3 px-4 font-semibold text-slate-200"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs">${a.project_id}</span></td>
             <td class="py-3 px-4">
-              <div class="font-medium text-white">${a.full_name || a.username}</div>
+              <div class="font-medium text-white flex items-center gap-1.5">
+                ${a.full_name || a.username}
+                ${a.metadata?.is_master ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold inline-flex items-center gap-1">👑 Master</span>' : ''}
+              </div>
               <div class="text-xs text-slate-400 font-mono">@${a.username}</div>
             </td>
             <td class="py-3 px-4 text-xs font-mono text-slate-300">${a.email}</td>
@@ -616,6 +703,9 @@
                 ` : ''}
                 <button onclick="openAssistedModal(${JSON.stringify(a).replace(/"/g, '&quot;')})" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition inline-flex items-center gap-1 shadow-sm shadow-indigo-600/30" title="Vincular a una nueva red social o plataforma">
                   <i data-lucide="plus" class="w-3.5 h-3.5"></i> + Red Social
+                </button>
+                <button onclick="handleDeleteAccount(${a.id}, '${a.username}')" class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-800 transition" title="Eliminar de la bóveda">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
             </td>
@@ -1030,6 +1120,86 @@
       if (project) url += `&project=${encodeURIComponent(project)}`;
       window.open(url, "_blank");
       closeExportModal();
+    }
+
+    function openAddAccountModal() {
+      document.getElementById("modal-add-account").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function closeAddAccountModal() {
+      document.getElementById("modal-add-account").classList.add("hidden");
+    }
+
+    function generateRandomPassForAdd() {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+      let pass = "";
+      for (let i = 0; i < 16; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById("add-password").value = pass;
+    }
+
+    async function handleManualAddAccount(e) {
+      e.preventDefault();
+      const email = document.getElementById("add-email").value.trim();
+      const username = document.getElementById("add-username").value.trim();
+      const fullname = document.getElementById("add-fullname").value.trim();
+      const password = document.getElementById("add-password").value.trim();
+      const project = document.getElementById("add-project").value.trim() || 'default';
+      const platform = document.getElementById("add-platform").value;
+      const status = document.getElementById("add-status").value;
+      const isMaster = document.getElementById("add-is-master").checked;
+
+      const btn = document.getElementById("btn-submit-add-account");
+      btn.disabled = true;
+
+      try {
+        const res = await fetch("/api/accounts/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            project_id: project,
+            email: email,
+            username: username,
+            full_name: fullname,
+            password: password,
+            platform_name: platform,
+            status: status,
+            is_master: isMaster
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`¡Cuenta ${username} guardada con éxito en la bóveda!`);
+          closeAddAccountModal();
+          loadAccounts();
+          loadSummary();
+        } else {
+          showToast(data.error || "Error al guardar la cuenta", "error");
+        }
+      } catch (err) {
+        showToast("Error de conexión", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function handleDeleteAccount(accountId, username) {
+      if (!confirm(`¿Seguro que deseás eliminar la cuenta @${username} (#${accountId}) de la bóveda?`)) return;
+      try {
+        const res = await fetch(`/api/accounts/${accountId}`, { method: "DELETE" });
+        const data = await res.json();
+        if (data.success) {
+          showToast("Cuenta eliminada de la bóveda");
+          loadAccounts();
+          loadSummary();
+        } else {
+          showToast("No se pudo eliminar la cuenta", "error");
+        }
+      } catch (err) {
+        showToast("Error al conectar con el servidor", "error");
+      }
     }
   </script>
 </body>

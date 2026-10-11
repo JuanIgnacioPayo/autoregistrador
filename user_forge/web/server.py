@@ -88,6 +88,65 @@ def api_accounts():
         result.append(data)
     return jsonify(result)
 
+@app.route("/api/accounts/create", methods=["POST"])
+def api_create_account():
+    payload = request.json or {}
+    project = payload.get("project_id", "default").strip() or "default"
+    email = payload.get("email", "").strip()
+    username = payload.get("username", "").strip()
+    password = payload.get("password", "").strip()
+    full_name = payload.get("full_name", "").strip() or username or (email.split("@")[0] if "@" in email else "Master")
+    platform_name = payload.get("platform_name", "custom").strip()
+    status = payload.get("status", "ACTIVE").strip() or "ACTIVE"
+
+    if not email:
+        return jsonify({"success": False, "error": "El email es obligatorio"}), 400
+
+    if not username:
+        username = email.split("@")[0].replace(".", "_")
+
+    if not password:
+        from user_forge.modules.personas.generator import PersonaGenerator
+        password = PersonaGenerator().generate_secure_password(16)
+
+    vault = get_vault()
+    account = vault.save_account(
+        project_id=project,
+        username=username,
+        email=email,
+        password=password,
+        full_name=full_name,
+        platform_name=platform_name,
+        status=status,
+        metadata={"is_master": payload.get("is_master", True)}
+    )
+
+    dec_pass = vault.get_decrypted_password(account)
+    acc_data = account.model_dump()
+    acc_data["password"] = dec_pass
+    acc_data.pop("password_encrypted", None)
+    return jsonify({"success": True, "account": acc_data})
+
+@app.route("/api/accounts/<int:account_id>", methods=["DELETE"])
+def api_delete_account(account_id: int):
+    vault = get_vault()
+    success = vault.delete_account(account_id)
+    return jsonify({"success": success})
+
+@app.route("/api/accounts/<int:account_id>/password", methods=["POST"])
+def api_update_account_password(account_id: int):
+    payload = request.json or {}
+    new_pass = payload.get("password", "").strip()
+    if not new_pass:
+        return jsonify({"success": False, "error": "Contraseña vacía"}), 400
+    vault = get_vault()
+    enc_pass = vault.encrypt(new_pass)
+    with vault._get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE accounts SET password_encrypted = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", (enc_pass, account_id))
+        conn.commit()
+    return jsonify({"success": True})
+
 @app.route("/api/personas/generate", methods=["POST"])
 def api_generate_personas():
     payload = request.json or {}

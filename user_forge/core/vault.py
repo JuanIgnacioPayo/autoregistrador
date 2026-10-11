@@ -111,6 +111,44 @@ class Vault:
             
         return self.get_account_by_id(account_id)
 
+    def save_account(
+        self,
+        project_id: str,
+        username: str,
+        email: str,
+        password: str,
+        full_name: Optional[str] = None,
+        bio: Optional[str] = None,
+        platform_name: str = "custom",
+        profile_dir: Optional[str] = None,
+        status: str = "ACTIVE",
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> Account:
+        enc_pass = self.encrypt(password)
+        meta_dict = metadata or {}
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO accounts (
+                    project_id, platform_name, username, email, password_encrypted,
+                    full_name, bio, profile_dir, status, metadata_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            """, (
+                project_id,
+                platform_name,
+                username,
+                email,
+                enc_pass,
+                full_name or username,
+                bio or "",
+                profile_dir,
+                status,
+                json.dumps(meta_dict)
+            ))
+            account_id = cursor.lastrowid
+            conn.commit()
+        return self.get_account_by_id(account_id)
+
     def get_account_by_id(self, account_id: int) -> Optional[Account]:
         with self._get_connection() as conn:
             cursor = conn.cursor()
