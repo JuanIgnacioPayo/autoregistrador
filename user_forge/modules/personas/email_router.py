@@ -14,8 +14,11 @@ class EmailRouter:
         catchall_base: Optional[str] = None,
         strategy: Optional[str] = None
     ):
-        self.domain = domain or settings.DEFAULT_EMAIL_DOMAIN
         self.catchall_base = catchall_base or settings.DEFAULT_CATCHALL_BASE
+        if not domain and catchall_base and "@" in catchall_base:
+            self.domain = catchall_base.split("@", 1)[1]
+        else:
+            self.domain = domain or settings.DEFAULT_EMAIL_DOMAIN
         self.strategy = strategy or settings.EMAIL_STRATEGY
 
     def clean_alias(self, raw_str: str) -> str:
@@ -30,10 +33,20 @@ class EmailRouter:
         tag_parts.append(self.clean_alias(username))
         alias = ".".join(tag_parts)
 
+        # If user provides a full email (e.g. 'proyecto.beta.de@gmail.com'), always use plus-addressing
+        if "@" in self.domain:
+            target_user, target_domain = self.domain.split("@", 1)
+            return f"{target_user}+{alias}@{target_domain}"
+
         if self.strategy == "plus":
+            target_user = "user"
+            target_domain = self.domain
             if "@" in self.catchall_base:
-                base_user, base_domain = self.catchall_base.split("@", 1)
-                return f"{base_user}+{alias}@{base_domain}"
-            return f"{self.catchall_base}+{alias}@{self.domain}"
+                base_u, base_d = self.catchall_base.split("@", 1)
+                target_user = base_u
+                if self.domain == settings.DEFAULT_EMAIL_DOMAIN:
+                    target_domain = base_d
+            return f"{target_user}+{alias}@{target_domain}"
         else:
             return f"{alias}@{self.domain}"
+

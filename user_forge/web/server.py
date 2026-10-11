@@ -187,7 +187,7 @@ def api_start_assisted():
     if not account:
         return jsonify({"success": False, "error": "Cuenta no encontrada"}), 404
 
-    browser_channel = payload.get("browser_channel", "chrome").strip()
+    browser_channel = payload.get("browser_channel", "system_default").strip()
 
     if browser_channel == "system_default":
         import webbrowser

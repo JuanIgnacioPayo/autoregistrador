@@ -366,11 +366,18 @@
           <div>
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Elegir Navegador / Modo de Apertura</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-indigo-500/50 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
-                <input type="radio" name="browser-channel" value="chrome" checked class="text-indigo-600 focus:ring-0">
+              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-emerald-500/50 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
+                <input type="radio" name="browser-channel" value="system_default" checked class="text-emerald-500 focus:ring-0">
+                <div>
+                  <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-400"></i> Modo Directo (1-Clic)</span>
+                  <span class="text-[10px] text-emerald-400 font-medium">Recomendado (Abre en tu navegador)</span>
+                </div>
+              </label>
+              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
+                <input type="radio" name="browser-channel" value="chrome" class="text-indigo-600 focus:ring-0">
                 <div>
                   <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="globe" class="w-3.5 h-3.5 text-indigo-400"></i> Google Chrome</span>
-                  <span class="text-[10px] text-slate-400">Oficial instalado (Recomendado)</span>
+                  <span class="text-[10px] text-slate-400">Playwright (Perfil aislado)</span>
                 </div>
               </label>
               <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
@@ -378,13 +385,6 @@
                 <div>
                   <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="compass" class="w-3.5 h-3.5 text-sky-400"></i> Microsoft Edge</span>
                   <span class="text-[10px] text-slate-400">Nativo Windows (Ultra estable)</span>
-                </div>
-              </label>
-              <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
-                <input type="radio" name="browser-channel" value="system_default" class="text-indigo-600 focus:ring-0">
-                <div>
-                  <span class="block text-xs font-bold text-white flex items-center gap-1.5"><i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-400"></i> Modo Directo (1-Clic)</span>
-                  <span class="text-[10px] text-slate-400">Abre en tu navegador actual</span>
                 </div>
               </label>
               <label class="flex items-center gap-2.5 p-2.5 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/40 transition">
@@ -904,7 +904,7 @@
     async function handleStartAssisted() {
       const url = document.getElementById("assisted-target-url").value.trim();
       const platformName = document.getElementById("assisted-platform-name").value.trim();
-      const browserChannel = document.querySelector('input[name="browser-channel"]:checked')?.value || 'chrome';
+      const browserChannel = document.querySelector('input[name="browser-channel"]:checked')?.value || 'system_default';
 
       if (!url) {
         showToast("Por favor elegí una plataforma o ingresá la URL del registro", "error");

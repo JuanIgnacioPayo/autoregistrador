@@ -287,6 +287,7 @@ class FormFiller:
             "email_filled": False,
             "username_filled": False,
             "password_filled": False,
+            "confirm_password_filled": False,
             "fullname_filled": False,
             "firstname_filled": False,
             "lastname_filled": False,
@@ -335,18 +336,51 @@ class FormFiller:
             first_name = parts[0]
             last_name = parts[1] if len(parts) > 1 else ""
 
-        if account.full_name:
+        if first_name:
             fn_selectors = [
+                "input[name='firstname']",
+                "input[name='first_name']",
+                "input[id*='firstname' i]",
+                "input[placeholder*='nombre' i]"
+            ]
+            for sel in fn_selectors:
+                try:
+                    loc = self.page.locator(sel)
+                    if loc.count() > 0 and loc.first.is_visible():
+                        loc.first.fill(first_name, timeout=1200)
+                        results["firstname_filled"] = True
+                        break
+                except Exception:
+                    pass
+
+        if last_name:
+            ln_selectors = [
+                "input[name='lastname']",
+                "input[name='last_name']",
+                "input[id*='lastname' i]",
+                "input[placeholder*='apellido' i]"
+            ]
+            for sel in ln_selectors:
+                try:
+                    loc = self.page.locator(sel)
+                    if loc.count() > 0 and loc.first.is_visible():
+                        loc.first.fill(last_name, timeout=1200)
+                        results["lastname_filled"] = True
+                        break
+                except Exception:
+                    pass
+
+        if account.full_name:
+            full_selectors = [
                 "input[name='name']",  # Twitter signup full name
                 "input[data-testid*='name' i]",
                 "input[name*='fullname' i]",
                 "input[name*='full_name' i]",
                 "input[id*='fullname' i]",
                 "input[placeholder*='nombre completo' i]",
-                "input[placeholder*='full name' i]",
-                "input[placeholder*='nombre' i]"
+                "input[placeholder*='full name' i]"
             ]
-            for sel in fn_selectors:
+            for sel in full_selectors:
                 try:
                     loc = self.page.locator(sel)
                     if loc.count() > 0 and loc.first.is_visible():
@@ -374,13 +408,30 @@ class FormFiller:
             except Exception:
                 pass
 
-        # 6. Password fields
+        # 6. Password and confirm password fields
+        confirm_selectors = [
+            "input[name*='confirm' i]",
+            "input[id*='confirm' i]",
+            "input[placeholder*='confirm' i]",
+            "input[placeholder*='repetir' i]",
+            "input[name='password_confirmation']"
+        ]
+        for sel in confirm_selectors:
+            try:
+                loc = self.page.locator(sel)
+                if loc.count() > 0 and loc.first.is_visible():
+                    loc.first.fill(plain_password, timeout=1200)
+                    results["confirm_password_filled"] = True
+                    break
+            except Exception:
+                pass
+
         pwd_selectors = [
-            "input[type='password']",
-            "input[name*='password' i]",
             "input[name='password']",
+            "input[autocomplete='new-password']",
             "input[autocomplete='current-password']",
-            "input[autocomplete='new-password']"
+            "input[name*='password' i]",
+            "input[type='password']"
         ]
         for sel in pwd_selectors:
             try:
@@ -391,6 +442,18 @@ class FormFiller:
                     break
             except Exception:
                 pass
+
+        try:
+            pwds = self.page.locator("input[type='password']")
+            if pwds.count() >= 2:
+                if not results.get("password_filled"):
+                    pwds.nth(0).fill(plain_password, timeout=1200)
+                    results["password_filled"] = True
+                if not results.get("confirm_password_filled"):
+                    pwds.nth(1).fill(plain_password, timeout=1200)
+                    results["confirm_password_filled"] = True
+        except Exception:
+            pass
 
         # 7. Terms checkboxes
         terms_checkboxes = [
