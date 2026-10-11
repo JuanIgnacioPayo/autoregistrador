@@ -453,7 +453,7 @@
       <div class="pt-3 border-t border-slate-800/80 shrink-0">
         <div id="assisted-action-btn">
           <button onclick="handleStartAssisted()" id="btn-launch-browser" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
-            <i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos
+            <i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador con Todo Copiado
           </button>
         </div>
       </div>
@@ -1126,14 +1126,35 @@
         else notice.classList.add("hidden");
       }
 
-      document.getElementById("assisted-progress-box").classList.add("hidden");
-      const launchBtn = document.getElementById("btn-launch-browser");
-      launchBtn.disabled = false;
-      launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos`;
-      document.getElementById("assisted-action-btn").classList.remove("hidden");
+      resetAssistedLaunchUI();
       document.getElementById("modal-assisted").classList.remove("hidden");
       lucide.createIcons();
     }
+
+    function resetAssistedLaunchUI() {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+      }
+      document.getElementById("assisted-progress-box").classList.add("hidden");
+      const launchBtn = document.getElementById("btn-launch-browser");
+      if (launchBtn) {
+        launchBtn.disabled = false;
+        launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador con Todo Copiado`;
+      }
+      const actionBox = document.getElementById("assisted-action-btn");
+      if (actionBox) {
+        actionBox.classList.remove("hidden");
+      }
+      lucide.createIcons();
+    }
+
+    // Allow user to switch browser at any moment and re-enable the launch button
+    document.querySelectorAll('input[name="browser-channel"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        resetAssistedLaunchUI();
+      });
+    });
 
     function closeAssistedModal() {
       document.getElementById("modal-assisted").classList.add("hidden");
@@ -1187,11 +1208,11 @@
           startPollingStatus(currentAccountId);
         } else {
           showToast(data.error || "No se pudo iniciar el navegador", "error");
-          launchBtn.disabled = false;
+          resetAssistedLaunchUI();
         }
       } catch (err) {
         showToast("Error de conexión al servidor local", "error");
-        launchBtn.disabled = false;
+        resetAssistedLaunchUI();
       }
     }
 
@@ -1205,18 +1226,10 @@
           if (data.active) {
             document.getElementById("assisted-step-label").innerText = data.step || "Trabajando en el navegador...";
             if (data.status === "IDLE" || data.status === "ERROR") {
-              const launchBtn = document.getElementById("btn-launch-browser");
-              launchBtn.disabled = false;
-              launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos`;
-              document.getElementById("assisted-action-btn").classList.remove("hidden");
-              lucide.createIcons();
+              resetAssistedLaunchUI();
             }
           } else {
-            const launchBtn = document.getElementById("btn-launch-browser");
-            launchBtn.disabled = false;
-            launchBtn.innerHTML = `<i data-lucide="external-link" class="w-4 h-4"></i> Abrir Navegador & Rellenar Campos`;
-            document.getElementById("assisted-action-btn").classList.remove("hidden");
-            lucide.createIcons();
+            resetAssistedLaunchUI();
           }
         } catch (e) {}
       }, 2000);

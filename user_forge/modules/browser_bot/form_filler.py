@@ -10,19 +10,15 @@ from user_forge.core.models import Account
 logger = logging.getLogger(__name__)
 
 def copy_to_windows_clipboard(text: str) -> bool:
-    """Copies text to the OS clipboard on Windows using PowerShell Set-Clipboard."""
+    """Copies text to the OS clipboard on Windows instantly using native clip."""
     try:
-        subprocess.run(
-            ["powershell", "-NoProfile", "-Command", "Set-Clipboard", "-Value", text],
-            check=False,
-            timeout=3,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
+        p = subprocess.Popen(["clip"], stdin=subprocess.PIPE, shell=True)
+        p.communicate(input=text.encode("utf-16le"), timeout=2)
         return True
     except Exception as e:
         logger.warning(f"Could not copy text to OS clipboard: {e}")
         return False
+
 
 class FormFiller:
     """
