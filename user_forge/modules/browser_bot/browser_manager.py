@@ -31,25 +31,25 @@ class BrowserManager:
         """
         Cleans orphaned processes and Chromium singleton lock files.
         If a previous browser window was closed abruptly or left background child processes,
-        this ensures Chromium can launch cleanly without hanging or error code 32.
+        this ensures Chromium can launch cleanly without hanging or error code 32 / SingletonLock.
         """
-        # 1. Terminate any orphaned ms-playwright chrome processes on Windows
+        # 1. Terminate orphaned chrome/msedge processes bound to this specific profile directory
         try:
-            ps_script = "Get-Process -Name chrome -ErrorAction SilentlyContinue | Select-Object Id, Path | ConvertTo-Json"
-            raw = subprocess.check_output(
+            ps_script = f"""
+            $profPath = '{str(profile_dir).replace("'", "''")}'
+            Get-CimInstance Win32_Process -Filter "Name = 'chrome.exe' OR Name = 'msedge.exe'" | Where-Object {{
+                $_.CommandLine -like "*$profPath*"
+            }} | ForEach-Object {{
+                Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+            }}
+            """
+            subprocess.run(
                 ["powershell", "-NoProfile", "-Command", ps_script],
-                timeout=4
-            ).decode("utf-8", errors="ignore").strip()
-            if raw:
-                items = json.loads(raw)
-                if isinstance(items, dict):
-                    items = [items]
-                pids_to_kill = [i["Id"] for i in items if "ms-playwright" in (i.get("Path") or "").lower()]
-                for pid in pids_to_kill:
-                    try:
-                        subprocess.run(["taskkill", "/F", "/PID", str(pid)], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    except Exception:
-                        pass
+                timeout=5,
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
         except Exception as e:
             logger.debug(f"Process cleanup note: {e}")
 
@@ -61,6 +61,7 @@ class BrowserManager:
                     lf.unlink()
                 except Exception:
                     pass
+
 
     def launch_persistent_context(
         self,

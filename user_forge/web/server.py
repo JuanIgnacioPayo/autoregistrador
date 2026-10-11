@@ -299,9 +299,10 @@ def api_start_assisted():
         except Exception as err:
             import traceback
             traceback.print_exc()
-            print(f"[BROWSER ERROR] {err}")
+            err_msg = str(err).encode("ascii", errors="replace").decode("ascii")
+            print(f"[BROWSER ERROR] {err_msg}")
             active_sessions[session_key]["status"] = "ERROR"
-            active_sessions[session_key]["error"] = str(err)
+            active_sessions[session_key]["error"] = err_msg
 
     t = threading.Thread(target=run_browser, daemon=True)
     t.start()
